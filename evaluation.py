@@ -10,6 +10,7 @@ warnings.filterwarnings("ignore")
 def eval(args):
     each_pair_txt_root = args.statistics_save_path
     match_visual_path = args.matching_image_save_path
+    device = args.device
     method_info_list = []
 
     method_info_now = {}
@@ -62,7 +63,7 @@ def eval(args):
                 if 'write_filename' in method_info['para_dict'].keys():
                     method_fullname = method_info['para_dict']['write_filename']
 
-                evaluator = EvaluationMain('cuda:0')
+                evaluator = EvaluationMain(device)
                 match_image_path = match_visual_path
                 if match_visual_path is not None:
                     match_image_path = os.path.join(match_visual_path, method_fullname,
@@ -111,7 +112,7 @@ def eval(args):
                     file_to_write.write(result_str)
                     file_to_write.write('\n')
 
-                temp=1
+                temp = 1
 
 
 def main():
