@@ -226,7 +226,7 @@ def main():
     parser = argparse.ArgumentParser(description="The evaluation of POP and compared methods")
 
     parser.add_argument('--training-path', type=str,
-                        default='./demo_input_images',
+                        default='./demo_training_images',
                         help='The path of training dataset')
     parser.add_argument('--save-checkpoint-path', type=str,
                         default='./S3Esti_checkpoint',
