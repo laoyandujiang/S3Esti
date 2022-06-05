@@ -90,10 +90,10 @@ class EvaluationMain():
             model_angle = EstiNet(need_bn=True, device=device, out_channels=angle_num,
                                   patch_size=patch_size, scale_ratio=self.esti_scale_ratio_list)
             checkpoint = torch.load(esti_checkpoint_path, map_location=device)
-            model_scale.load_state_dict(checkpoint['model_scale'], strict=True)
+            model_scale.load_state_dict(checkpoint['model_scale'], strict=False)
             model_scale.eval()
 
-            model_angle.load_state_dict(checkpoint['model_angle'], strict=True)
+            model_angle.load_state_dict(checkpoint['model_angle'], strict=False)
             model_angle.eval()
 
             model_scale.to(device)
