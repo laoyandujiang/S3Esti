@@ -10,9 +10,24 @@ conda activate S3Esti
 conda install numpy matplotlib scipy
 conda install pytorch==1.4.0 cudatoolkit=10.1 -c pytorch
 pip install imgaug
-pip uninstall opencv-python
-pip install opencv-contrib-python==3.4.8.29
 ```
+
+Please clone the repository with the git command:
+
+```bash
+git clone https://github.com/laoyandujiang/S3Esti.git
+``````
+
+The trained weights of S3Esti have been also included in this repository to simplify the configuration.
+
+## Demo: Visualize the scales and orientations of S3Esti
+A simple demo script `demo_esti_scale_angle.py` is provided to estimate and visualize the keypoint scales and orientations for a given image. Please run the demo with the following command:
+
+```bash
+python demo_esti_scale_angle.py xxx/xxx.png
+``````
+
+Here, `xxx/xxx.png` is the path of the testing image. The demo script will localize keypoints with a SIFT detector, and then estimate and visualize their scales and orientations.
 
 ## Evaluation of S3Esti
 We provide the evaluation code for [HPatches](https://github.com/hpatches/hpatches-dataset) dataset, which references the evaluation processes of [HesAffNet](https://github.com/ducha-aiki/affnet) and [POP](https://github.com/elvintanhust/POP-Interest-Point). Before perform the evaluation on the entire HPatches, you can first verify the environment by running the script directly:

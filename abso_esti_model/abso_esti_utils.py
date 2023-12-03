@@ -45,22 +45,25 @@ def get_wrap_patches(image_tensor, model_scale, model_angle, point_vec,
 
 
 def cross_main_pair(scale_mat, angle_mat):
-    point_num, each_max_num = scale_mat.shape
-    assert angle_mat.shape[1] == each_max_num
-    new_col = 2 * each_max_num - 1
+    point_num, scale_num = scale_mat.shape
+    assert angle_mat.shape[0] == point_num
+    angle_num = angle_mat.shape[1]
+    new_col = scale_num + angle_num - 1
     scale_pair_mat = np.zeros((point_num, new_col), dtype=scale_mat.dtype)
     angle_pair_mat = np.zeros((point_num, new_col), dtype=scale_mat.dtype)
-    scale_pair_mat[:, :each_max_num - 1] = np.tile(scale_mat[:, 0:1], (1, each_max_num - 1))
-    scale_pair_mat[:, each_max_num - 1:] = scale_mat
-    angle_pair_mat[:, :each_max_num] = angle_mat
-    angle_pair_mat[:, each_max_num:] = np.tile(angle_mat[:, 0:1], (1, each_max_num - 1))
+    scale_pair_mat[:, :angle_num - 1] = np.tile(scale_mat[:, 0:1], (1, angle_num - 1))
+    scale_pair_mat[:, angle_num - 1:] = scale_mat
+    angle_pair_mat[:, :angle_num] = angle_mat
+    if scale_num-1>0:
+        angle_pair_mat[:, angle_num:] = np.tile(angle_mat[:, 0:1], (1, scale_num - 1))
     return scale_pair_mat, angle_pair_mat
 
 
 def get_wrap_patches_multi(image_tensor, model_scale, model_angle, point_vec,
                            patch_size, esti_scale_ratio_list, ignore_str=None,
                            scale_angle_result_list=None,
-                           point_id_list=None, scale_adapt_ratio=None):
+                           point_id_list=None, scale_adapt_ratio=None,
+                           scale_num=None,angle_num=None):
     esti_patch_size = 32
     point_num = point_vec.shape[0]
     device = image_tensor.device
@@ -87,15 +90,19 @@ def get_wrap_patches_multi(image_tensor, model_scale, model_angle, point_vec,
     scale_local_max = scale_score * (scale_score == scale_max).astype('float32')
     angle_local_max = angle_score * (angle_score == angle_max).astype('float32')
     each_max_num = 3
+    if scale_num is None:
+        scale_num=each_max_num
+    if angle_num is None:
+        angle_num=each_max_num
     scale_sort = np.sort(scale_local_max, axis=1)[:, ::-1]
     angle_sort = np.sort(angle_local_max, axis=1)[:, ::-1]
     scale_sort_ind = np.argsort(scale_local_max, axis=1)[:, ::-1]
     angle_sort_ind = np.argsort(angle_local_max, axis=1)[:, ::-1]
     scale_pair_ind, angle_pair_ind = cross_main_pair(
-        scale_sort_ind[:, :each_max_num], angle_sort_ind[:, :each_max_num])
+        scale_sort_ind[:, :scale_num], angle_sort_ind[:, :angle_num])
     scale_pair_score, angle_pair_score = cross_main_pair(
-        scale_sort[:, :each_max_num], angle_sort[:, :each_max_num])
-    point_id = np.tile(np.arange(point_num)[:, np.newaxis], (1, 2 * each_max_num - 1))
+        scale_sort[:, :scale_num], angle_sort[:, :angle_num])
+    point_id = np.tile(np.arange(point_num)[:, np.newaxis], (1, scale_num + angle_num - 1))
     min_thre = 0.001
     remain_pos = ((scale_pair_score > min_thre) & (angle_pair_score > min_thre))
     scale_ind_pred = scale_pair_ind[remain_pos]
